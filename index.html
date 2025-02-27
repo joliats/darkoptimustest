@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Book</title>
+    <style>
+        body { margin: 0; overflow: hidden; }
+        canvas { display: block; }
+    </style>
+</head>
+<body>
+    <script type="module">
+        import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.158/build/three.module.min.js';
+
+        // Scene setup
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        // Book dimensions
+        const bookWidth = 2, bookHeight = 3, bookDepth = 0.3;
+        const bookGeometry = new THREE.BoxGeometry(bookWidth, bookHeight, bookDepth);
+
+        // Load cover texture
+        const textureLoader = new THREE.TextureLoader();
+        const coverTexture = textureLoader.load('darkoptimist.jpg'); // Change this to your cover image
+
+        // Book materials
+        const bookMaterials = [
+            new THREE.MeshBasicMaterial({ color: 0xaaaaaa }), // Left side
+            new THREE.MeshBasicMaterial({ color: 0xaaaaaa }), // Right side
+            new THREE.MeshBasicMaterial({ color: 0xffffff }), // Top
+            new THREE.MeshBasicMaterial({ color: 0xffffff }), // Bottom
+            new THREE.MeshBasicMaterial({ map: coverTexture }), // Front (cover)
+            new THREE.MeshBasicMaterial({ color: 0xaaaaaa }) // Back
+        ];
+
+        // Create book mesh
+        const book = new THREE.Mesh(bookGeometry, bookMaterials);
+        scene.add(book);
+
+        // Camera position
+        camera.position.z = 5;
+
+        // Cursor movement effect
+        document.addEventListener('mousemove', (event) => {
+            const x = (event.clientX / window.innerWidth) * 2 - 1;
+            const y = (event.clientY / window.innerHeight) * 2 - 1;
+            book.rotation.y = x * 0.5;
+            book.rotation.x = y * 0.5;
+        });
+
+        // Animation loop
+        function animate() {
+            requestAnimationFrame(animate);
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+        });
+
+    </script>
+</body>
+</html>
